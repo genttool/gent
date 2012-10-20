@@ -35,7 +35,7 @@ switch(cmd) {
         def workingDir = System.getProperty("user.dir")
         Repository repository = builder
             .setGitDir(new File("C:\\Users\\chanwit\\.gent\\.metadata\\proj\\.git"))
-            .setWorkTree(new File(workingDir))
+            .setWorkTree(new File(workingDir +"\\test"))
             .readEnvironment()
             .build();
         Git git = new Git(repository);
