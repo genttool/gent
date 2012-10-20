@@ -14,6 +14,7 @@ def cli = new CliBuilder(usage: 'gent [options] [command] <repository>')
 cli.with {
     h longOpt: 'help', 'Show help'
     t longOpt: 'template', 'Use template'
+    d longOpt: 'name', 'Project name'
 }
 
 def options = cli.parse(args)
@@ -48,6 +49,10 @@ switch(cmd) {
         def repoPath = options.arguments()[0].replace('/','_')
         def userHome = System.getProperty("user.home")
         def _ = System.getProperty("file.separator")
+        def dir = options.d
+        if(!dir) {
+            dir = options.arguments()[0].split('/')[1]
+        }
 
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
@@ -62,7 +67,7 @@ switch(cmd) {
             def workingDir = System.getProperty("user.dir")
             Repository repository = builder
                 .setGitDir(new File("${userHome}$_.gent$_.repo$_${repoPath}$_.git"))
-                .setWorkTree(new File(workingDir))
+                .setWorkTree(new File("${workingDir}$_${dir}"))
                 .readEnvironment()
                 .build();
             Git git = new Git(repository);
