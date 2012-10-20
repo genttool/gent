@@ -1,6 +1,5 @@
 @GrabResolver(name='jgit-repository', root='http://download.eclipse.org/jgit/maven')
 @Grab(group='org.eclipse.jgit', module='org.eclipse.jgit', version='2.0.0.201206130900-r')
-@Grab(group='commons-cli',module='commons-cli',version='1.2')
 
 import java.io.*
 
@@ -13,7 +12,7 @@ import org.eclipse.jgit.storage.file.*
 import org.eclipse.jgit.transport.*
 
 def cli = new CliBuilder(usage:'gent [options] [command] <repository>')
-cli.t(longOpt:'template')
+cli.t(longOpt:'template', 'Template')
 def opts = cli.parse(args)
 if(!opts) {
     println cli.usage()
