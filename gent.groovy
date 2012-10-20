@@ -1,7 +1,10 @@
 @GrabResolver(name='jgit-repository', root='http://download.eclipse.org/jgit/maven')
 @Grab(group='org.eclipse.jgit', module='org.eclipse.jgit', version='2.0.0.201206130900-r')
+@Grab(group='commons-cli',module='commons-cli',version='1.2')
 
 import java.io.*
+
+import groovy.util.*
 
 import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.*
@@ -9,13 +12,30 @@ import org.eclipse.jgit.lib.*
 import org.eclipse.jgit.storage.file.*
 import org.eclipse.jgit.transport.*
 
+def cli = new CliBuilder(usage:'gent [options] [command] <repository>')
+cli.t(longOpt:'template')
+def opts = cli.parse(args)
+if(!opts) {
+    println cli.usage()
+    return
+}
+
+def cmd = options.arguments()[0]
 def commands = ['test','create']
-def cmd = ''
-if(args[0] in commands) {
-    cmd = args[0]
+if(cmd in commands) {
+    // do nothing
 } else {
     cmd = 'clone'
 }
+
+/*
+def home
+if(windows) {
+    home =
+} else {
+    home =
+}
+*/
 
 switch(cmd) {
     case 'test':
@@ -29,7 +49,7 @@ switch(cmd) {
         clone.setBare(false);
         clone.setNoCheckout(true);
         clone.setURI("git://github.com/${args[0]}.gent.git");
-        clone.setDirectory(new File("C:\\Users\\chanwit\\.gent\\.metadata\\${repoPath}"));
+        clone.setDirectory(new File("C:\\Users\\chanwit\\.gent\\.repo\\${repoPath}"));
         // clone.setCredentialsProvider(user);
         clone.call();
 
@@ -37,7 +57,7 @@ switch(cmd) {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
             def workingDir = System.getProperty("user.dir")
             Repository repository = builder
-                .setGitDir(new File("C:\\Users\\chanwit\\.gent\\.metadata\\${repoPath}\\.git"))
+                .setGitDir(new File("C:\\Users\\chanwit\\.gent\\.repo\\${repoPath}\\.git"))
                 .setWorkTree(new File(workingDir))
                 .readEnvironment()
                 .build();
