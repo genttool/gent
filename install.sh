@@ -1,5 +1,8 @@
 #!/bin/sh
 
+##############################################################
+# 1. Installing Groovy and Ivy jar
+##############################################################
 GENT=$HOME/.gent
 cygwin=false;
 case "`uname`" in
@@ -13,6 +16,35 @@ mkdir -p $GENT
 cd $GENT
 curl -O http://cloud.github.com/downloads/chanwit/gent/groovy-all-ivy.pack.gz
 unpack200 -r groovy-all-ivy.pack.gz groovy-all-ivy.jar
+
+##############################################################
+# 2. Installing Gent Groovy Script
+##############################################################
+curl -O https://raw.github.com/chanwit/gent/master/gent.groovy
+
+##############################################################
+# 3. Installing Gent Shell Script into ~/bin
+##############################################################
+BIN=$HOME/bin
+mkdir -p $BIN
+
+echo "#!/bin/sh
+
+GENT=\$HOME/.gent
+cygwin=false;
+case \"\`uname\`\" in
+    CYGWIN*)
+        cygwin=true
+        GENT=\`cygpath -w \"\$USERPROFILE/.gent\"\`
+        ;;
+esac
+if \$cygwin ; then
+    java -Dgroovy.grape.report.downloads=true -jar \"\$GENT\groovy-all-ivy.jar\" \"\$GENT\\gent.groovy\" \"\$@\"
+else
+    java -Dgroovy.grape.report.downloads=true -jar \"\$GENT/groovy-all-ivy.jar\" \"\$GENT/gent.groovy\" \"\$@\"
+fi" > $BIN/gent
+
+chmod a+x $BIN/gent
 
 ### if(~/bin does not exists) mkdir ~/bin
 ### create ~/bin/gent
