@@ -57,8 +57,8 @@ switch(cmd) {
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setNoCheckout(true);
-        clone.setURI("git://github.com/${args[0]}.gent.git");
-        clone.setDirectory(new File("${userHome}$_.gent$_.repo$_${repoPath}"));
+        clone.setURI("git://github.com/${repoPath}.gent.git");
+        clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${repoPath}"));
         // TODO clone.setCredentialsProvider(user);
         clone.call();
 
@@ -66,8 +66,8 @@ switch(cmd) {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
             def workingDir = System.getProperty("user.dir")
             Repository repository = builder
-                .setGitDir(new File("${userHome}$_.gent$_.repo$_${repoPath}$_.git"))
-                .setWorkTree(new File("${workingDir}$_${dir}"))
+                .setGitDir(new File("${userHome}${_}.gent${_}.repo${_}${repoPath}${_}.git"))
+                .setWorkTree(new File("${workingDir}${_}${dir}"))
                 .readEnvironment()
                 .build();
             Git git = new Git(repository);
