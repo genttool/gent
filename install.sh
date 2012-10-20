@@ -14,8 +14,8 @@ esac
 
 mkdir -p $GENT
 cd $GENT
-curl -s -O http://cloud.github.com/downloads/chanwit/gent/groovy-all-188-ivy.pack.gz
-unpack200 -r groovy-all-188-ivy.pack.gz groovy-all-ivy.jar
+curl -s -O http://cloud.github.com/downloads/chanwit/gent/groovy-all-1.8.8-ivy.pack.gz
+unpack200 -r groovy-all-1.8.8-ivy.pack.gz groovy-all-ivy.jar
 
 ##############################################################
 # 2. Installing Gent Groovy Script
