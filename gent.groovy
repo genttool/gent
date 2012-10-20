@@ -3,19 +3,25 @@
 
 import java.io.*
 
-import groovy.util.*
-
 import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.*
 import org.eclipse.jgit.lib.*
 import org.eclipse.jgit.storage.file.*
 import org.eclipse.jgit.transport.*
 
-def cli = new CliBuilder(usage:'gent [options] [command] <repository>')
-cli.t(longOpt:'template', 'Template')
-def opts = cli.parse(args)
-if(!opts) {
-    println cli.usage()
+def cli = new CliBuilder(usage: 'gent [options] [command] <repository>')
+
+cli.with {
+    h longOpt: 'help', 'Show help'
+    t longOpt: 'template', 'Use template'
+}
+
+def options = cli.parse(args)
+if (!options) {
+    return
+}
+if(options.h || options.arguments().size() == 0) {
+    cli.usage()
     return
 }
 
@@ -27,36 +33,35 @@ if(cmd in commands) {
     cmd = 'clone'
 }
 
-/*
-def home
-if(windows) {
-    home =
-} else {
-    home =
-}
-*/
+def isWindows = {-> System.getProperty("os.name").startsWith("Windows") }
 
 switch(cmd) {
     case 'test':
         println System.getProperty("user.dir")
+        println System.getProperty("user.home")
+        def _ = System.getProperty("file.separator")
+        def b = "b"
+        println "a$_$b"
         break
 
     case 'clone':
-        def repoPath = args[0].replace('/','_')
+        def repoPath = options.arguments()[0].replace('/','_')
+        def userHome = System.getProperty("user.home")
+        def _ = System.getProperty("file.separator")
 
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setNoCheckout(true);
         clone.setURI("git://github.com/${args[0]}.gent.git");
-        clone.setDirectory(new File("C:\\Users\\chanwit\\.gent\\.repo\\${repoPath}"));
-        // clone.setCredentialsProvider(user);
+        clone.setDirectory(new File("${userHome}$_.gent$_.repo$_${repoPath}"));
+        // TODO clone.setCredentialsProvider(user);
         clone.call();
 
         try {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
             def workingDir = System.getProperty("user.dir")
             Repository repository = builder
-                .setGitDir(new File("C:\\Users\\chanwit\\.gent\\.repo\\${repoPath}\\.git"))
+                .setGitDir(new File("${userHome}$_.gent$_.repo$_${repoPath}$_.git"))
                 .setWorkTree(new File(workingDir))
                 .readEnvironment()
                 .build();
