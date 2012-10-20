@@ -39,9 +39,9 @@ case \"\`uname\`\" in
         ;;
 esac
 if \$cygwin ; then
-    java -Dgroovy.grape.report.downloads=true -jar \"\$GENT\groovy-all-ivy.jar\" \"\$GENT\\gent.groovy\" \"\$@\"
+    java -jar \"\$GENT\groovy-all-ivy.jar\" \"\$GENT\\gent.groovy\" \"\$@\"
 else
-    java -Dgroovy.grape.report.downloads=true -jar \"\$GENT/groovy-all-ivy.jar\" \"\$GENT/gent.groovy\" \"\$@\"
+    java -jar \"\$GENT/groovy-all-ivy.jar\" \"\$GENT/gent.groovy\" \"\$@\"
 fi" > $BIN/gent
 
 chmod a+x $BIN/gent
