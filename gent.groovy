@@ -23,11 +23,13 @@ switch(cmd) {
         break
 
     case 'clone':
+        def repoPath = args[0].replace('/','_')
+
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setNoCheckout(true);
-        clone.setURI("git://github.com/${args[0]}.git");
-        clone.setDirectory(new File("C:\\Users\\chanwit\\.gent\\.metadata\\${args[0].replace('/','_')}"));
+        clone.setURI("git://github.com/${args[0]}.gent.git");
+        clone.setDirectory(new File("C:\\Users\\chanwit\\.gent\\.metadata\\${repoPath}"));
         // clone.setCredentialsProvider(user);
         clone.call();
 
@@ -35,7 +37,7 @@ switch(cmd) {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
             def workingDir = System.getProperty("user.dir")
             Repository repository = builder
-                .setGitDir(new File("C:\\Users\\chanwit\\.gent\\.metadata\\${args[0].replace('/','_')}\\.git"))
+                .setGitDir(new File("C:\\Users\\chanwit\\.gent\\.metadata\\${repoPath}\\.git"))
                 .setWorkTree(new File(workingDir))
                 .readEnvironment()
                 .build();
