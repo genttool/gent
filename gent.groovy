@@ -14,6 +14,9 @@ import org.eclipse.jgit.transport.*
 
 import org.apache.commons.io.*
 
+import java.util.Properties
+import groovy.text.*
+
 def cli = new CliBuilder(usage: 'gent [options] [command] <repository>')
 
 cli.with {
@@ -60,12 +63,12 @@ switch(cmd) {
 
     case 'clone':
         def remoteRepoPath = options.arguments()[0]
-        def repoPath = options.arguments()[0].replace('/','_')
+        def repoPath = remoteRepoPath.replace('/','_')
         def userHome = System.getProperty("user.home")
         def _ = System.getProperty("file.separator")
         def dir = options['d']
         if(!dir) {
-            dir = options.arguments()[0].split('/')[1]
+            dir = remoteRepoPath.split('/')[1]
         }
 
         def workingDir = System.getProperty("user.dir")
@@ -106,6 +109,40 @@ switch(cmd) {
             //
             def files = FileUtils.listFiles(new File(targetDir), ["gitignore"] as String[], true)
             files.each { if(it.length() == 0) {FileUtils.forceDelete(it)} }
+
+            //
+            // load properties
+            //
+            def binding = new Properties()
+            def propFile = new File("${targetDir}${_}gent.properties")
+            def propRader = propFile.newReader("UTF-8")
+            binding.load(propRader)
+            binding.setProperty("name", dir)
+            binding.setProperty("now",  new Date().toString())
+            propRader.close()
+
+            //
+            // delete gent.properties
+            //
+            FileUtils.forceDelete(propFile)
+
+            //
+            // scan all .in files
+            // they are template
+            //
+            def templates = FileUtils.listFiles(new File(targetDir), ["in"] as String[], true)
+            templates.each {
+                def engine = new GStringTemplateEngine()
+                def tmplReader = it.newReader("UTF-8")
+                def template = new GStringTemplateEngine().createTemplate(tmplReader)
+                FileUtils.writeStringToFile(
+                    new File(it.getAbsolutePath() - '.in'),
+                    template.make(binding).toString(),
+                    "UTF-8")
+                tmplReader.close()
+                // delete .in file
+                FileUtils.forceDelete(it)
+            }
         } catch(e) {
             println e.message
         } finally {
