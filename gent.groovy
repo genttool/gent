@@ -46,6 +46,7 @@ switch(cmd) {
         break
 
     case 'clone':
+        def remoteRepoPath = options.arguments()[0]
         def repoPath = options.arguments()[0].replace('/','_')
         def userHome = System.getProperty("user.home")
         def _ = System.getProperty("file.separator")
@@ -57,8 +58,8 @@ switch(cmd) {
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setNoCheckout(true);
-        clone.setURI("git://github.com/${repoPath}.gent.git");
-        clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${repoPath}"));
+        clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
+        clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${repoPath}"))
         // TODO clone.setCredentialsProvider(user);
         clone.call();
 
