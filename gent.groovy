@@ -1,7 +1,10 @@
 @GrabResolver(name='jgit-repository', root='http://download.eclipse.org/jgit/maven')
 @Grab(group='org.eclipse.jgit', module='org.eclipse.jgit', version='2.0.0.201206130900-r')
+@Grab(group='commons-io', module='commons-io', version='2.4')
 
 import java.io.*
+
+import java.security.MessageDigest
 
 import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.*
@@ -9,12 +12,14 @@ import org.eclipse.jgit.lib.*
 import org.eclipse.jgit.storage.file.*
 import org.eclipse.jgit.transport.*
 
+import org.apache.commons.io.*
+
 def cli = new CliBuilder(usage: 'gent [options] [command] <repository>')
 
 cli.with {
     h longOpt: 'help', 'Show help'
     t longOpt: 'template', 'Use template'
-    d longOpt: 'name', 'Project name'
+    d args:1, argName:'dir', longOpt: 'name', 'Project directory to create'
 }
 
 def options = cli.parse(args)
@@ -36,6 +41,13 @@ if(cmd in commands) {
 
 def isWindows = {-> System.getProperty("os.name").startsWith("Windows") }
 
+def md5 = { str ->
+    MessageDigest md = MessageDigest.getInstance("MD5")
+    md.update(str.toString().getBytes())
+    BigInteger hash = new BigInteger(1, md.digest())
+    return hash.toString(16)
+}
+
 switch(cmd) {
     case 'test':
         println System.getProperty("user.dir")
@@ -43,6 +55,7 @@ switch(cmd) {
         def _ = System.getProperty("file.separator")
         def b = "b"
         println "a$_$b"
+        println options['d']
         break
 
     case 'clone':
@@ -50,45 +63,48 @@ switch(cmd) {
         def repoPath = options.arguments()[0].replace('/','_')
         def userHome = System.getProperty("user.home")
         def _ = System.getProperty("file.separator")
-        def dir = options.d
+        def dir = options['d']
         if(!dir) {
             dir = options.arguments()[0].split('/')[1]
         }
 
-        try {
-            CloneCommand clone = Git.cloneRepository();
-            clone.setBare(false);
-            clone.setNoCheckout(true);
-            clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
-            clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${repoPath}"))
-            // TODO clone.setCredentialsProvider(user);
-            clone.call();
-        } catch(org.eclipse.jgit.api.errors.JGitInternalException e) {
-            println e.message
-            // TODO update existing repo
-        }
+        def workingDir = System.getProperty("user.dir")
+        def targetDir = "${workingDir}${_}${dir}"
+        def hash = md5(targetDir)
 
+        CloneCommand clone = Git.cloneRepository();
+        clone.setBare(false);
+        clone.setNoCheckout(true);
+        clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
+        clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${hash}"))
+        // TODO clone.setCredentialsProvider(user);
+        def g = clone.call();
+        g.getRepository().close()
+
+        Repository repository = null
         try {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
-            def workingDir = System.getProperty("user.dir")
-            Repository repository = builder
-                .setGitDir(new File("${userHome}${_}.gent${_}.repo${_}${repoPath}${_}.git"))
-                .setWorkTree(new File("${workingDir}${_}${dir}"))
+            repository = builder
+                .setGitDir(new File("${userHome}${_}.gent${_}.repo${_}${hash}${_}.git"))
+                .setWorkTree(new File(targetDir))
                 .readEnvironment()
                 .build();
             Git git = new Git(repository);
+
             //
-            // git checkout -b master origin/master
+            // git checkout origin/master
             //
             def checkout = git.checkout()
-                .setCreateBranch(true)
-                .setName("master")
-                .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                .setCreateBranch(false)
+                .setName("origin/master")
                 .setStartPoint("origin/master")
+                .setForce(true)
             checkout.call()
-            println checkout.result.status
         } catch(e) {
             println e.message
+        } finally {
+            repository.close()
+            FileUtils.forceDelete(new File("${userHome}${_}.gent${_}.repo${_}${hash}"))
         }
         break
 }
