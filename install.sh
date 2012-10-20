@@ -9,8 +9,8 @@ case "`uname`" in
         ;;
 esac
 
-mkdir -p $GENT/.gent
-cd $GENT/.gent
+mkdir -p $GENT
+cd $GENT
 curl -O http://cloud.github.com/downloads/chanwit/gent/groovy-all-ivy.pack.gz
 unpack200 -r groovy-all-ivy.pack.gz groovy-all-ivy.jar
 
