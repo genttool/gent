@@ -55,13 +55,18 @@ switch(cmd) {
             dir = options.arguments()[0].split('/')[1]
         }
 
-        CloneCommand clone = Git.cloneRepository();
-        clone.setBare(false);
-        clone.setNoCheckout(true);
-        clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
-        clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${repoPath}"))
-        // TODO clone.setCredentialsProvider(user);
-        clone.call();
+        try {
+            CloneCommand clone = Git.cloneRepository();
+            clone.setBare(false);
+            clone.setNoCheckout(true);
+            clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
+            clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${repoPath}"))
+            // TODO clone.setCredentialsProvider(user);
+            clone.call();
+        } catch(org.eclipse.jgit.api.errors.JGitInternalException e) {
+            println e.message
+            // TODO update existing repo
+        }
 
         try {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
