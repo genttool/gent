@@ -1,5 +1,5 @@
 @GrabResolver(name='jgit-repository', root='http://download.eclipse.org/jgit/maven')
-@Grab(group='org.eclipse.jgit', module='org.eclipse.jgit', version='2.1.0.201209190230-r')
+@Grab(group='org.eclipse.jgit', module='org.eclipse.jgit', version='2.0.0.201206130900-r')
 
 import java.io.*
 
@@ -26,24 +26,32 @@ switch(cmd) {
         CloneCommand clone = Git.cloneRepository();
         clone.setBare(false);
         clone.setNoCheckout(true);
-        clone.setURI("git://github.com/chanwit/gent.git");
-        clone.setDirectory(new File("C:\\Users\\chanwit\\.gent\\.metadata\\proj"));
+        clone.setURI("git://github.com/${args[0]}.git");
+        clone.setDirectory(new File("C:\\Users\\chanwit\\.gent\\.metadata\\${args[0].replace('/','_')}"));
         // clone.setCredentialsProvider(user);
         clone.call();
 
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        def workingDir = System.getProperty("user.dir")
-        Repository repository = builder
-            .setGitDir(new File("C:\\Users\\chanwit\\.gent\\.metadata\\proj\\.git"))
-            .setWorkTree(new File(workingDir +"\\test"))
-            .readEnvironment()
-            .build();
-        Git git = new Git(repository);
-        // git checkout -b master origin/master
-        git.checkout()
-           .setCreateBranch(true)
-           .setName("master")
-           .setStartPoint("origin/master")
-           .call();
+        try {
+            FileRepositoryBuilder builder = new FileRepositoryBuilder();
+            def workingDir = System.getProperty("user.dir")
+            Repository repository = builder
+                .setGitDir(new File("C:\\Users\\chanwit\\.gent\\.metadata\\${args[0].replace('/','_')}\\.git"))
+                .setWorkTree(new File(workingDir))
+                .readEnvironment()
+                .build();
+            Git git = new Git(repository);
+            //
+            // git checkout -b master origin/master
+            //
+            def checkout = git.checkout()
+                .setCreateBranch(true)
+                .setName("master")
+                .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                .setStartPoint("origin/master")
+            checkout.call()
+            println checkout.result.status
+        } catch(e) {
+            println e.message
+        }
         break
 }
