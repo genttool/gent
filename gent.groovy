@@ -100,6 +100,12 @@ switch(cmd) {
                 .setStartPoint("origin/master")
                 .setForce(true)
             checkout.call()
+
+            //
+            // delete all .gitignore "MARKER" files whose size() is 0
+            //
+            def files = FileUtils.listFiles(new File(targetDir), ["gitignore"] as String[], true)
+            files.each { if(it.length() == 0) {FileUtils.forceDelete(it)} }
         } catch(e) {
             println e.message
         } finally {
