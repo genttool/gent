@@ -14,13 +14,13 @@ esac
 
 mkdir -p $GENT
 cd $GENT
-curl -O http://cloud.github.com/downloads/chanwit/gent/groovy-all-ivy.pack.gz
+curl -s -O http://cloud.github.com/downloads/chanwit/gent/groovy-all-ivy.pack.gz
 unpack200 -r groovy-all-ivy.pack.gz groovy-all-ivy.jar
 
 ##############################################################
 # 2. Installing Gent Groovy Script
 ##############################################################
-curl -O https://raw.github.com/chanwit/gent/master/gent.groovy
+curl -s -O https://raw.github.com/chanwit/gent/master/gent.groovy
 
 ##############################################################
 # 3. Installing Gent Shell Script into ~/bin
@@ -45,14 +45,6 @@ else
 fi" > $BIN/gent
 
 chmod a+x $BIN/gent
-
-### if(~/bin does not exists) mkdir ~/bin
-### create ~/bin/gent
-###
-### java -Dgroovy.grape.report.downloads=true -jar groovy-all-ivy.jar gent.groovy "$@"
-### unix:   $HOME
-### cygwin: $USERPROFILE
-###
 
 ###
 ### $ gent init (resolve all required jars for the first time)
