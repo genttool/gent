@@ -4,7 +4,7 @@ GENT
 GENT is a project template generator, inspired by conscript and g8, written in Groovy.
 To install,
 
-    curl -s https://raw.github.com/chanwit/gent/master/install.sh | sh
+    curl -s https://raw.github.com/genttool/gent/master/install.sh | sh
 
 How does GENT work?
 ===================
@@ -17,7 +17,7 @@ To create a new project just call:
 
 For example,
 
-    gent chanwit/gradle-groovy
+    gent genttool/gradle-groovy
 
-The repository `chanwit/gradle-groovy.gent` is an example template for building a Groovy project with Gradle.
+The repository `genttool/gradle-groovy.gent` is an example template for building a Groovy project with Gradle.
 Note that GENT will be looking for a Github repository with the `.gent` suffix.
