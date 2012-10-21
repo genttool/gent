@@ -4,7 +4,7 @@ GENT
 GENT is a project template generator, inspired by conscript and g8, written in Groovy.
 To install,
 
-    curl -Ls bit.ly/get-gent | sh
+    curl -Ls git.io/gent | sh
 
 How does GENT work?
 ===================
