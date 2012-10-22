@@ -143,6 +143,11 @@ switch(cmd) {
                 // delete .in file
                 FileUtils.forceDelete(it)
             }
+
+            if(binding['welcomeMessage']) {
+                println binding['welcomeMessage']
+            }
+
         } catch(e) {
             println e.message
         } finally {
