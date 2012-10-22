@@ -145,6 +145,7 @@ switch(cmd) {
             }
 
             if(binding['welcomeMessage']) {
+                println
                 println binding['welcomeMessage']
             }
 
