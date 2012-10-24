@@ -39,9 +39,12 @@ case \"\`uname\`\" in
         ;;
 esac
 if \$cygwin ; then
-    java -jar \"\$GENT\groovy-all-ivy.jar\" \"\$GENT\\gent.groovy\" \"\$@\"
+    java -jar \"\$GENT\groovy-all-ivy.jar\" \$GENT_OPTS \"\$GENT\\gent.groovy\" \"\$@\"
 else
-    java -jar \"\$GENT/groovy-all-ivy.jar\" \"\$GENT/gent.groovy\" \"\$@\"
+    java -jar \"\$GENT/groovy-all-ivy.jar\" \$GENT_OPTS \"\$GENT/gent.groovy\" \"\$@\"
 fi" > $BIN/gent
 
 chmod a+x $BIN/gent
+
+export GENT_OPTS="-Dgroovy.grape.report.downloads=true"
+$BIN/gent init

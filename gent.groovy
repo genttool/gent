@@ -44,7 +44,7 @@ if(options['h'] || options.arguments().size() == 0) {
 }
 
 def cmd = options.arguments()[0]
-def commands = ['test','create']
+def commands = ['test','create', 'init']
 if(cmd in commands) {
     // do nothing
 } else {
@@ -61,6 +61,10 @@ def md5 = { str ->
 }
 
 switch(cmd) {
+    case 'init':
+        println "\nGENT dependencies initialized."
+        break
+
     case 'test':
         println System.getProperty("user.dir")
         println System.getProperty("user.home")
