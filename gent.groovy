@@ -17,8 +17,8 @@ import org.apache.commons.io.*
 import java.util.Properties
 import groovy.text.*
 
-def cli = new CliBuilder(usage: 'gent [options] [command] <template name>')
-cli.header = 'GENT tool (c) 2012 the GENT Project and contributors.'
+def cli = new CliBuilder(usage: 'gent [options] <template name>')
+cli.header = 'GENT tool (c) 2012 the GENT Project and contributors.\n'
 cli.with {
     h longOpt: 'help', 'Show help'
     d longOpt: 'name', args:1, argName:'dir', 'Apply the template to the target directory'
