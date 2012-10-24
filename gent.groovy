@@ -17,13 +17,13 @@ import org.apache.commons.io.*
 import java.util.Properties
 import groovy.text.*
 
-def cli = new CliBuilder(usage: 'gent [options] [command] <repository>')
-
+def cli = new CliBuilder(usage: 'gent [options] [command] <template name>')
+cli.header = 'GENT tool (c) 2012 the GENT Project and contributors.'
 cli.with {
-    _ longOpt: 'help', 'Show help'
-    t longOpt: 'template', 'Use template'
-    d args:1, argName:'dir', longOpt: 'name', 'Target directory'
-    h longOpt: 'http', 'Use HTTP protocal instead of GIT'
+    h longOpt: 'help', 'Show help'
+    d longOpt: 'name', args:1, argName:'dir', 'Apply the template to the target directory'
+    _ longOpt: 'http',  'Use HTTP protocol instead of GIT'
+    _ longOpt: 'https', 'Use HTTPS protocol instead of GIT'
 }
 
 //
@@ -38,7 +38,7 @@ def options = cli.parse(args.sort { a, b ->
 if (!options) {
     return
 }
-if(options['help'] || options.arguments().size() == 0) {
+if(options['h'] || options.arguments().size() == 0) {
     cli.usage()
     return
 }
@@ -110,8 +110,10 @@ switch(cmd) {
         CloneCommand clone = Git.cloneRepository()
         clone.setBare(false);
         clone.setNoCheckout(true);
-        if(options['h']) {
+        if(options['http']) {
             clone.setURI("http://github.com/${remoteRepoPath}.gent.git")
+        } else if(options['https']) {
+            clone.setURI("https://github.com/${remoteRepoPath}.gent.git")
         } else {
             clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
         }
