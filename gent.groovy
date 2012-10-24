@@ -25,7 +25,15 @@ cli.with {
     d args:1, argName:'dir', longOpt: 'name', 'Target directory'
 }
 
-def options = cli.parse(args)
+//
+// make options float in-front-of commands
+//
+def options = cli.parse(args.sort { a, b ->
+    if(a.startsWith("-")) return -1
+    if(b.startsWith("-")) return  1
+    return 0
+})
+
 if (!options) {
     return
 }
