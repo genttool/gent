@@ -22,7 +22,7 @@ def cli = new CliBuilder(usage: 'gent [options] [command] <repository>')
 cli.with {
     h longOpt: 'help', 'Show help'
     t longOpt: 'template', 'Use template'
-    d args:1, argName:'dir', longOpt: 'name', 'Project directory to create'
+    d args:1, argName:'dir', longOpt: 'name', 'Target directory'
 }
 
 def options = cli.parse(args)
@@ -62,8 +62,31 @@ switch(cmd) {
         break
 
     case 'clone':
-        def remoteRepoPath = options.arguments()[0]
-        def repoPath = remoteRepoPath.replace('/','_')
+        def a = options.arguments()
+        def pathIndex
+        if(a.size() == 1) {
+            pathIndex = 0
+        }
+        else {
+            pathIndex = 1
+        }
+
+        def remoteRepoPath = a[pathIndex]
+
+        //
+        // if there's .gent suffix, remove it
+        //
+        if(remoteRepoPath.endsWith('.gent')) {
+            remoteRepoPath = remoteRepoPath - '.gent'
+        }
+
+        //
+        // in case of no repo prefix, use the defult username "genttool"
+        //
+        if(remoteRepoPath.contains('/') == false) {
+            remoteRepoPath = "genttool/${remoteRepoPath}"
+        }
+
         def userHome = System.getProperty("user.home")
         def _ = System.getProperty("file.separator")
         def dir = options['d']
@@ -75,50 +98,50 @@ switch(cmd) {
         def targetDir = "${workingDir}${_}${dir}"
         def hash = md5(targetDir)
 
-        CloneCommand clone = Git.cloneRepository();
+        CloneCommand clone = Git.cloneRepository()
         clone.setBare(false);
         clone.setNoCheckout(true);
         clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
         clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${hash}"))
         // TODO clone.setCredentialsProvider(user);
-        def g = clone.call();
+        def g = clone.call()
         g.getRepository().close()
 
         Repository repository = null
         try {
-            FileRepositoryBuilder builder = new FileRepositoryBuilder();
+            FileRepositoryBuilder builder = new FileRepositoryBuilder()
             repository = builder
                 .setGitDir(new File("${userHome}${_}.gent${_}.repo${_}${hash}${_}.git"))
                 .setWorkTree(new File(targetDir))
                 .readEnvironment()
-                .build();
-            Git git = new Git(repository);
+                .build()
+            Git git = new Git(repository)
 
             //
             // git checkout origin/master
             //
             def checkout = git.checkout()
                 .setCreateBranch(false)
-                .setName("origin/master")
-                .setStartPoint("origin/master")
+                .setName('origin/master')
+                .setStartPoint('origin/master')
                 .setForce(true)
             checkout.call()
 
             //
             // delete all .gitignore "MARKER" files whose size() is 0
             //
-            def files = FileUtils.listFiles(new File(targetDir), ["gitignore"] as String[], true)
-            files.each { if(it.length() == 0) {FileUtils.forceDelete(it)} }
+            def files = FileUtils.listFiles(new File(targetDir), ['gitignore'] as String[], true)
+            files.each { if(it.length() == 0) FileUtils.forceDelete(it) }
 
             //
             // load properties
             //
             def binding = new Properties()
             def propFile = new File("${targetDir}${_}gent.properties")
-            def propRader = propFile.newReader("UTF-8")
+            def propRader = propFile.newReader('UTF-8')
             binding.load(propRader)
-            binding.setProperty("name", dir)
-            binding.setProperty("now",  new Date().toString())
+            binding.setProperty('name', dir)
+            binding.setProperty('now',  new Date().toString())
             propRader.close()
 
             //
@@ -130,10 +153,10 @@ switch(cmd) {
             // scan all .in files
             // they are template
             //
-            def templates = FileUtils.listFiles(new File(targetDir), ["in"] as String[], true)
+            def templates = FileUtils.listFiles(new File(targetDir), ['in'] as String[], true)
             templates.each {
                 def engine = new GStringTemplateEngine()
-                def tmplReader = it.newReader("UTF-8")
+                def tmplReader = it.newReader('UTF-8')
                 def template = new GStringTemplateEngine().createTemplate(tmplReader)
                 FileUtils.writeStringToFile(
                     new File(it.getAbsolutePath() - '.in'),
