@@ -20,9 +20,10 @@ import groovy.text.*
 def cli = new CliBuilder(usage: 'gent [options] [command] <repository>')
 
 cli.with {
-    h longOpt: 'help', 'Show help'
+    _ longOpt: 'help', 'Show help'
     t longOpt: 'template', 'Use template'
     d args:1, argName:'dir', longOpt: 'name', 'Target directory'
+    h longOpt: 'http', 'Use HTTP protocal instead of GIT'
 }
 
 //
@@ -37,7 +38,7 @@ def options = cli.parse(args.sort { a, b ->
 if (!options) {
     return
 }
-if(options.h || options.arguments().size() == 0) {
+if(options['help'] || options.arguments().size() == 0) {
     cli.usage()
     return
 }
@@ -109,7 +110,11 @@ switch(cmd) {
         CloneCommand clone = Git.cloneRepository()
         clone.setBare(false);
         clone.setNoCheckout(true);
-        clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
+        if(options['h']) {
+            clone.setURI("http://github.com/${remoteRepoPath}.gent.git")
+        } else {
+            clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
+        }
         clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${hash}"))
         // TODO clone.setCredentialsProvider(user);
         def g = clone.call()
