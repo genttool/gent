@@ -11,7 +11,7 @@ How does GENT work?
 
 Firstly, the `install.sh` script will be fetching a Pack200'ed Groovy jar to bootstraping.
 You'll find `~/bin/gent` installed into your system.
-To create a new project, `proj`, just call:
+For example, to create a new Groovy project, `proj`, just call:
 
     gent --name=proj genttool/gradle-groovy
 
@@ -23,3 +23,4 @@ Looking for other templates?
 ============================
 
 Gent templates and their instructions are listed on [Wiki](https://github.com/genttool/gent/wiki).
+We currently have templates to support Gradle, Grails, Groovy, Vert.x and ZK. All contributions are welcome.
