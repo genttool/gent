@@ -21,3 +21,8 @@ For example,
 
 The repository `genttool/gradle-groovy.gent` is an example template for building a Groovy project with Gradle.
 Note that GENT will be looking for a Github repository with the `.gent` suffix.
+
+Gent Templates
+==============
+
+Gent templates and their instructions are listed on [Wiki](https://github.com/genttool/gent/wiki).
