@@ -1,7 +1,7 @@
 GENT
 ====
 
-GENT is a project template generator, inspired by conscript and g8, written in Groovy.
+GENT is a template-based project generator, inspired by conscript and g8, written in Groovy.
 To install,
 
     curl -Ls git.io/gent | sh
