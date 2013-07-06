@@ -24,6 +24,7 @@ cli.with {
     d longOpt: 'name', args:1, argName:'dir', 'Apply the template to the target directory'
     _ longOpt: 'http',  'Use HTTP protocol instead of GIT'
     _ longOpt: 'https', 'Use HTTPS protocol instead of GIT'
+    _ longOpt: 'repo', args:1, argName:'url', 'Repository URL'
 }
 
 //
@@ -38,11 +39,10 @@ def options = cli.parse(args.sort { a, b ->
 if (!options) {
     return
 }
-if(options['h'] || options.arguments().size() == 0) {
+if(options['h'] || (!options['repo'] && options.arguments().size() == 0)) {
     cli.usage()
     return
 }
-
 def cmd = options.arguments()[0]
 def commands = ['test','create', 'init']
 if(cmd in commands) {
@@ -84,28 +84,36 @@ switch(cmd) {
             pathIndex = 1
         }
 
-        def remoteRepoPath = a[pathIndex]
+        def remoteRepoURI = a[pathIndex].with { path ->
+            if (options['repo']) {
+                return options['repo']
+            } else {
+                //
+                // if there's .gent suffix, remove it
+                //
+                path -= ~/\.gent$/
 
-        //
-        // if there's .gent suffix, remove it
-        //
-        if(remoteRepoPath.endsWith('.gent')) {
-            remoteRepoPath = remoteRepoPath - '.gent'
+                //
+                // in case of no repo prefix, use the defult username "genttool"
+                //
+                if(!path.contains('/')) {
+                    path = "genttool/${path}"
+                }
+
+                if(options['http']) {
+                    return "http://github.com/${path}.gent.git"
+                } else if(options['https']) {
+                    return "https://github.com/${path}.gent.git"
+                } else {
+                    return "git://github.com/${path}.gent.git"
+                }
+            }
         }
 
-        //
-        // in case of no repo prefix, use the defult username "genttool"
-        //
-        if(remoteRepoPath.contains('/') == false) {
-            remoteRepoPath = "genttool/${remoteRepoPath}"
-        }
+        def dir = options['d'] ?: (remoteRepoURI.split('/')[-1] - ~/\.gent\.git$/)
 
         def userHome = System.getProperty("user.home")
         def _ = System.getProperty("file.separator")
-        def dir = options['d']
-        if(!dir) {
-            dir = remoteRepoPath.split('/')[1]
-        }
 
         def workingDir = System.getProperty("user.dir")
         def targetDir = "${workingDir}${_}${dir}"
@@ -114,13 +122,7 @@ switch(cmd) {
         CloneCommand clone = Git.cloneRepository()
         clone.setBare(false);
         clone.setNoCheckout(true);
-        if(options['http']) {
-            clone.setURI("http://github.com/${remoteRepoPath}.gent.git")
-        } else if(options['https']) {
-            clone.setURI("https://github.com/${remoteRepoPath}.gent.git")
-        } else {
-            clone.setURI("git://github.com/${remoteRepoPath}.gent.git")
-        }
+        clone.setURI(remoteRepoURI)
         clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${hash}"))
         // TODO clone.setCredentialsProvider(user);
         def g = clone.call()
