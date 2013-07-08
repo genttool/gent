@@ -66,12 +66,16 @@ switch(cmd) {
         break
 
     case 'test':
-        println System.getProperty("user.dir")
-        println System.getProperty("user.home")
+        println "user.dir  = " + System.getProperty("user.dir")
+        println "user.home = " + System.getProperty("user.home")
+        println "file.separator = " + System.getProperty("file.separator")
         def _ = System.getProperty("file.separator")
         def b = "b"
         println "a$_$b"
         println options['d']
+        println options.arguments()
+        println options.repo
+        break
         break
 
     case 'clone':
