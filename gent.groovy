@@ -1,6 +1,7 @@
 @GrabResolver(name='jgit-repository', root='http://download.eclipse.org/jgit/maven')
 @Grab(group='org.eclipse.jgit', module='org.eclipse.jgit', version='2.0.0.201206130900-r')
 @Grab(group='commons-io', module='commons-io', version='2.4')
+@Grab(group='org.ini4j', module='ini4j', version='0.5.2')
 
 import java.io.*
 
@@ -17,8 +18,10 @@ import org.apache.commons.io.*
 import java.util.Properties
 import groovy.text.*
 
-def cli = new CliBuilder(usage: 'gent [options] <template name>')
-cli.header = 'GENT tool (c) 2012 the GENT Project and contributors.\n'
+import org.ini4j.*
+
+def cli = new CliBuilder(usage: 'gent [command] [options] <template name>')
+cli.header = 'GENT tool (c) 2012-2013 the GENT Project and contributors.\n'
 cli.with {
     h longOpt: 'help', 'Show help'
     d longOpt: 'name', args:1, argName:'dir', 'Apply the template to the target directory'
@@ -44,7 +47,7 @@ if(options['h'] || (!options['repo'] && options.arguments().size() == 0)) {
     return
 }
 def cmd = options.arguments()[0]
-def commands = ['test','create', 'init']
+def commands = ['test','create', 'init', 'add']
 if(cmd in commands) {
     // do nothing
 } else {
@@ -76,6 +79,35 @@ switch(cmd) {
         println options.arguments()
         println options.repo
         break
+
+    case 'add':
+        //
+        // Example command:
+        // $ gent add grails --repo=http://github.com/genttool/grails.gent
+        //
+        def _ = System.getProperty("file.separator")
+        def userHome = System.getProperty("user.home")
+        def configFile = "${userHome}${_}.gent${_}config"
+        def ini
+        if(isWindows()) {
+            ini = new Wini(new File(configFile))
+        } else {
+            ini = new Ini(new File(configFile))
+        }
+        def alias = options.arguments()[1]
+        def repoPath = options.repo
+        if(!repoPath) {
+            println "No repository specified."
+            return
+        }
+        def oldValue = ini.get("repositories", alias)
+        if(!oldValue) {
+            ini.put("repositories", alias, repoPath)
+            ini.store()
+        } else {
+            println "Repository '${alias}' already existed."
+            return
+        }
         break
 
     case 'clone':
