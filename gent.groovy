@@ -104,6 +104,11 @@ switch(cmd) {
         def _ = System.getProperty("file.separator")
         def userHome = System.getProperty("user.home")
         def configFile = "${userHome}${_}.gent${_}config"
+
+        if(new File(configFile).exists() == false) {
+            new File(configFile).createNewFile()
+        }
+
         def ini
         if(isWindows()) {
             ini = new Wini(new File(configFile))
