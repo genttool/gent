@@ -147,15 +147,17 @@ switch(cmd) {
                 def userHome = System.getProperty("user.home")
                 def configFile = "${userHome}${_}.gent${_}config"
 
-                def ini
-                if(isWindows()) {
-                    ini = new Wini(new File(configFile))
-                } else {
-                    ini = new Ini(new File(configFile))
-                }
-                def repoPath = ini.get("repositories", path)
-                if(repoPath) {
-                    return repoPath + ".git"
+                if(new File(configFile).exists()) {
+                    def ini
+                    if(isWindows()) {
+                        ini = new Wini(new File(configFile))
+                    } else {
+                        ini = new Ini(new File(configFile))
+                    }
+                    def repoPath = ini.get("repositories", path)
+                    if(repoPath) {
+                        return repoPath + ".git"
+                    }
                 }
 
                 //
