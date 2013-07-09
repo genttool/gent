@@ -46,18 +46,23 @@ if(options['h'] || (!options['repo'] && options.arguments().size() == 0)) {
     cli.usage()
     println '''
   Commands:
-  clone - the default command to clone the template from
-          the remote repository and apply to the target
-          project.
+  clone  - the default command to clone the template from
+           the remote repository and apply to the target
+           project.
 
       $ gent --name=<proj> <template name>
    or $ gent clone --name=<proj> <template name>
    or $ gent clone --name=<proj> --repo=<repository URL>
 
-  add   - for adding a new template alias to
-          the configuration file (.gent/config).
+  add    - for adding a new template alias to
+           the configuration file (.gent/config).
 
       $ gent add <template name> --repo=<repository URL>
+
+  remove - for removing a template alias from
+           the configuration file (.gent/config).
+
+      $ gent remove <template name>
 
     '''
     return
