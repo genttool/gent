@@ -79,6 +79,23 @@ def md5 = { str ->
     return hash.toString(16)
 }
 
+def configFile = { ->
+    def _ = System.getProperty("file.separator")
+    def userHome = System.getProperty("user.home")
+    def configFileName = "${userHome}${_}.gent${_}config"
+    return configFileName
+}
+
+def openIni = { config ->
+    def ini
+    if(isWindows()) {
+        ini = new Wini(new File(config))
+    } else {
+        ini = new Ini(new File(config))
+    }
+    return ini
+}
+
 switch(cmd) {
     case 'init':
         println "\nGENT dependencies initialized."
@@ -101,20 +118,13 @@ switch(cmd) {
         // Example command:
         // $ gent add grails --repo=http://github.com/genttool/grails.gent
         //
-        def _ = System.getProperty("file.separator")
-        def userHome = System.getProperty("user.home")
-        def configFile = "${userHome}${_}.gent${_}config"
+        def config = configFile()
 
-        if(new File(configFile).exists() == false) {
-            new File(configFile).createNewFile()
+        if(new File(config).exists() == false) {
+            new File(config).createNewFile()
         }
 
-        def ini
-        if(isWindows()) {
-            ini = new Wini(new File(configFile))
-        } else {
-            ini = new Ini(new File(configFile))
-        }
+        def ini = openIni(config)
         def alias = options.arguments()[1]
         def repoPath = options.repo
         if(!repoPath) {
@@ -148,17 +158,10 @@ switch(cmd) {
                 //
                 // lookup into the config file
                 //
-                def _ = System.getProperty("file.separator")
-                def userHome = System.getProperty("user.home")
-                def configFile = "${userHome}${_}.gent${_}config"
+                def config = configFile()
 
-                if(new File(configFile).exists()) {
-                    def ini
-                    if(isWindows()) {
-                        ini = new Wini(new File(configFile))
-                    } else {
-                        ini = new Ini(new File(configFile))
-                    }
+                if(new File(config).exists()) {
+                    def ini = openIni(config)
                     def repoPath = ini.get("repositories", path)
                     if(repoPath) {
                         return repoPath + ".git"
