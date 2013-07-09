@@ -63,7 +63,7 @@ if(options['h'] || (!options['repo'] && options.arguments().size() == 0)) {
     return
 }
 def cmd = options.arguments()[0]
-def commands = ['test','create', 'init', 'add']
+def commands = ['test','create', 'init', 'add', 'remove']
 if(cmd in commands) {
     // do nothing
 } else {
@@ -137,6 +137,25 @@ switch(cmd) {
             ini.store()
         } else {
             println "Repository '${alias}' already existed."
+            return
+        }
+        break
+
+    case 'remove':
+        def config = configFile()
+
+        if(new File(config).exists() == false) {
+            new File(config).createNewFile()
+        }
+
+        def ini = openIni(config)
+        def alias = options.arguments()[1]
+        def oldValue = ini.get("repositories", alias)
+        if(oldValue) {
+            ini.remove("repositories", alias)
+            ini.store()
+        } else {
+            println "Repository '$alias' does not exist."
             return
         }
         break
