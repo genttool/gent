@@ -141,6 +141,24 @@ switch(cmd) {
                 return options['repo']
             } else {
                 //
+                // lookup into the config file
+                //
+                def _ = System.getProperty("file.separator")
+                def userHome = System.getProperty("user.home")
+                def configFile = "${userHome}${_}.gent${_}config"
+
+                def ini
+                if(isWindows()) {
+                    ini = new Wini(new File(configFile))
+                } else {
+                    ini = new Ini(new File(configFile))
+                }
+                def repoPath = ini.get("repositories", path)
+                if(repoPath) {
+                    return repoPath + ".git"
+                }
+
+                //
                 // if there's .gent suffix, remove it
                 //
                 path -= ~/\.gent$/
