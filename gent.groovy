@@ -197,8 +197,14 @@ switch(cmd) {
         clone.setURI(remoteRepoURI)
         clone.setDirectory(new File("${userHome}${_}.gent${_}.repo${_}${hash}"))
         // TODO clone.setCredentialsProvider(user);
-        def g = clone.call()
-        g.getRepository().close()
+        try {
+            def g = clone.call()
+            g.getRepository().close()
+        } catch(e) {
+            println e.message
+            FileUtils.forceDelete(new File("${userHome}${_}.gent${_}.repo${_}${hash}"))
+            return
+        }
 
         Repository repository = null
         try {
